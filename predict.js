@@ -33,6 +33,13 @@ document.getElementById("slideToggle").addEventListener("click", () => {
     slideToggle = !slideToggle;
 })
 
+let soundOn = false;
+document.getElementById("toggleActivation").addEventListener("click", () => {
+    soundOn = !soundOn;
+    chordSynth.map(a => a.triggerRelease());
+    chordPlaying = null;
+});
+
 export async function predictWebcam(video, gestureRecognizer, ctx) {
     let nowInMs = Date.now();
     let handResults;
@@ -87,23 +94,25 @@ export async function predictWebcam(video, gestureRecognizer, ctx) {
 
         if (leftHand) {
             if (leftHand.gesture === "Open_Palm") {
-                if (!chordPlaying) {
-                    const now = Tone.now();
-                    chordSynth.map(a => a.triggerRelease());
-                    const [root, freqs, adj] = getNotes(leftHand.x, leftHand.y);
-                    for (let [i,freq] of freqs.entries()) {
-                        chordSynth[i].triggerAttack(freq, now);
-                    }
-                    chordPlaying = root;
-                    prevLeftRot = leftHand.rot;
-                } else {
-                    if (slideToggle) {
+                if (soundOn) {
+                    if (!chordPlaying) {
+                        const now = Tone.now();
+                        chordSynth.map(a => a.triggerRelease());
                         const [root, freqs, adj] = getNotes(leftHand.x, leftHand.y);
-                        for (let [i,freq] of freqs.entries()) {
-                            chordSynth[i].oscillator.frequency.rampTo(freq, 0.1);
+                        for (let [i, freq] of freqs.entries()) {
+                            chordSynth[i].triggerAttack(freq, now);
                         }
+                        chordPlaying = root;
+                        prevLeftRot = leftHand.rot;
+                    } else {
+                        if (slideToggle) {
+                            const [root, freqs, adj] = getNotes(leftHand.x, leftHand.y);
+                            for (let [i, freq] of freqs.entries()) {
+                                chordSynth[i].oscillator.frequency.rampTo(freq, 0.1);
+                            }
+                        }
+                        // pitchShift.pitch = teoria.interval(root, chordPlaying).semitones() + (adj);
                     }
-                    // pitchShift.pitch = teoria.interval(root, chordPlaying).semitones() + (adj);
                 }
             } else if (leftHand.gesture === "Closed_Fist" && prevLeftGesture !== "Closed_Fist") {
                 const now = Tone.now();
