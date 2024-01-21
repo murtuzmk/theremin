@@ -28,6 +28,11 @@ let chordSynth = [0, 0, 0, 0, 0].map(() => new Tone.Synth().connect(pitchShift))
 chordSynth.forEach(a => a.set({ volume: -1000 }));
 console.log(chordSynth);
 
+// recorders
+const recorder = new Tone.Recorder();
+const synth = new Tone.Synth().connect(recorder);
+let recording;
+
 let slideToggle = false;
 document.getElementById("slideToggle").addEventListener("click", () => {
     slideToggle = !slideToggle;
@@ -39,6 +44,38 @@ document.getElementById("toggleActivation").addEventListener("click", () => {
     chordSynth.map(a => a.triggerRelease());
     chordPlaying = null;
 });
+
+let record = false;
+document.getElementById("toggleRecord").addEventListener("click", () => {
+    record = !record;
+    if (record) {
+        recorder.start();
+        console.log("recording audio");
+    } else {
+        recorder.stop((buffer) => {
+            recording = new Blob([buffer], { type: "audio/webm" });
+            console.log("stopping recording audio");
+        });
+
+    }
+})
+document.getElementById("videoDownload").addEventListener("click", () => {
+    if (recording) {
+        console.log('downloading audio');
+        const anchor = document.createElement("a");
+        
+        if (recording instanceof Blob) {
+            const dorl = URL.createObjectURL(recording);
+            anchor.download = "recording.webm";
+            anchor.href = dorl;
+            anchor.click();
+        } else {
+            console.error("Invalid recording format");
+        }
+    } else {
+        console.error("No recording available");
+    }
+})
 
 export async function predictWebcam(video, gestureRecognizer, ctx) {
     let nowInMs = Date.now();
