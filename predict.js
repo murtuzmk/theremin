@@ -77,6 +77,7 @@ document.getElementById("videoDownload").addEventListener("click", () => {
     }
 })
 
+
 export async function predictWebcam(video, gestureRecognizer, ctx) {
     let nowInMs = Date.now();
     let handResults;
@@ -134,10 +135,12 @@ export async function predictWebcam(video, gestureRecognizer, ctx) {
                 if (soundOn) {
                     if (!chordPlaying) {
                         const now = Tone.now();
+                      
                         chordSynth.map(a => { a.triggerRelease(); a.set({ volume: -1000 }) });
                         const [root, freqs, adj] = getNotes(leftHand.x, leftHand.y);
                         for (let [i, freq] of freqs.entries()) {
                         chordSynth[i].set({ volume: -20 });
+
                             chordSynth[i].triggerAttack(freq, now);
                         }
                         chordPlaying = root;
@@ -145,6 +148,7 @@ export async function predictWebcam(video, gestureRecognizer, ctx) {
                     } else {
                         if (slideToggle) {
                             const [root, freqs, adj] = getNotes(leftHand.x, leftHand.y);
+                          
                             for (let [i, synth] of chordSynth.entries()) {
                             if (!freqs[i]) {
                                 chordSynth[i].triggerRelease();
@@ -157,6 +161,7 @@ export async function predictWebcam(video, gestureRecognizer, ctx) {
                             } else {
                                     chordSynth[i].oscillator.frequency.rampTo(freqs[i], 0.1);
                             }
+
                             }
                         }
                         // pitchShift.pitch = teoria.interval(root, chordPlaying).semitones() + (adj);
