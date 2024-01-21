@@ -8,8 +8,15 @@
     </head>
     
     <body class="min-h-screen justify-center bg-stone-800">
-    
-      <button type="button" class="focus:outline-none text-3xl pt-5 text-zinc-200">theremin</button>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lora&display=swap');
+        </style> 
+     <button id="backtosplash" type="button"  style="font-family: 'Lora', serif;" class="focus:outline-none text-3xl pt-5 text-zinc-200">theremin</button>
+     <script type="text/javascript">
+       document.getElementById("backtosplash").onclick = function () {
+         location.href = "//localhost:5173/splash"
+       };
+     </script>
       <div id="content" class="flex flex-row gap-5 content-center">
         <!-- VIDEO -->
         <div class="flex-basis-5/7" id="video-container">
@@ -27,7 +34,6 @@
     
               <svg id="svgActivate" class="fill-current w-6 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                 stroke-width="1.0" stroke="currentColor">
-                <!-- Initial SVG content -->
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75" />
               </svg>
@@ -43,7 +49,6 @@
                 let isStart = true;
 
                 button.addEventListener('click', function () {
-                  // Toggle the state
                   isStart = !isStart;
                   // Update SVG and text based on the state
                   if (isStart) {
@@ -260,15 +265,15 @@
             <span class="py-3 text-stone-700 text-xl " style="vertical-align: top; ">Slide</span>
           </div>
           <div>
-            <label class="switch" for="majorBtn">
-                <input id="majorBtn" type="checkbox" style="opacity: 0; position: absolute;">
+            <label class="switch" for="drums">
+                <input id="drums" type="checkbox" style="opacity: 0; position: absolute;">
                 <span class="slider"></span>
             </label>
-            <span class="text-stone-700 text-xl" style="vertical-align: top; ">Major / Minor</span>
+            <span class="text-stone-700 text-xl" style="vertical-align: top; ">Drums</span>
             </div>
 
             <!-- BPM SLIDER -->
-            <p class="text-2xl text-stone-700 ">BPM</p>
+            <p class="text-2xl text-stone-700 mt-2">BPM</p>
             <div class="relative mb-6">
               <label for="labels-range-input" class="sr-only">Labels range</label>
               <input id="labels-range-input" type="range" value="90" min="70" max="160" step="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
@@ -280,7 +285,43 @@
           </div>
 
           <div class="border-b border-gray-300 pb-3"></div>
-          <div class="text-2xl text-stone-700">Notes:</div>
+          <div class="text-2xl text-stone-700 my-4 inline-flex items-center">Current Chord:
+
+          <div id="wordContainer" class="max-w-md pt-2 ml-3"></div>
+        </div> 
+          <script>
+            const recentWords = [];
+
+            // Function to log a word and update the display
+            function displayChord(word) {
+              recentWords.push(word);
+
+              if (recentWords.length > 1) {
+                recentWords.shift();
+              }
+
+              // Update the display
+              updateDisplay();
+            }
+
+            // Function to update the display with recent words
+            function updateDisplay() {
+              const wordContainer = document.getElementById('wordContainer');
+
+              // Clear the container
+              wordContainer.innerHTML = '';
+
+              // Display each recent word
+              recentWords.forEach((word) => {
+                const wordElement = document.createElement('div');
+                wordElement.textContent = word;
+                wordElement.classList.add('mb-2');
+                wordContainer.appendChild(wordElement);
+              });
+            }
+
+
+          </script>
             </div>
       </div>
       <div id="warning-div" role="alert"
