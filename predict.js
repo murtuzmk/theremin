@@ -33,6 +33,13 @@ document.getElementById("slideToggle").addEventListener("click", () => {
     slideToggle = !slideToggle;
 })
 
+let soundOn = false;
+document.getElementById("toggleActivation").addEventListener("click", () => {
+    soundOn = !soundOn;
+    chordSynth.map(a => a.triggerRelease());
+    chordPlaying = null;
+});
+
 export async function predictWebcam(video, gestureRecognizer, ctx) {
     let nowInMs = Date.now();
     let handResults;
@@ -87,20 +94,21 @@ export async function predictWebcam(video, gestureRecognizer, ctx) {
 
         if (leftHand) {
             if (leftHand.gesture === "Open_Palm") {
-                if (!chordPlaying) {
-                    const now = Tone.now();
-                    chordSynth.map(a => { a.triggerRelease(); a.set({ volume: -1000 }) });
-                    const [root, freqs, adj] = getNotes(leftHand.x, leftHand.y);
-                    for (let [i,freq] of freqs.entries()) {
-                        chordSynth[i].set({ volume: -20 });
-                        chordSynth[i].triggerAttack(freq, now);
-                    }
-                    chordPlaying = root;
-                    prevLeftRot = leftHand.rot;
-                } else {
-                    if (slideToggle) {
+                if (soundOn) {
+                    if (!chordPlaying) {
+                        const now = Tone.now();
+                        chordSynth.map(a => { a.triggerRelease(); a.set({ volume: -1000 }) });
                         const [root, freqs, adj] = getNotes(leftHand.x, leftHand.y);
-                        for (let [i,synth] of chordSynth.entries()) {
+                        for (let [i, freq] of freqs.entries()) {
+                        chordSynth[i].set({ volume: -20 });
+                            chordSynth[i].triggerAttack(freq, now);
+                        }
+                        chordPlaying = root;
+                        prevLeftRot = leftHand.rot;
+                    } else {
+                        if (slideToggle) {
+                            const [root, freqs, adj] = getNotes(leftHand.x, leftHand.y);
+                            for (let [i, synth] of chordSynth.entries()) {
                             if (!freqs[i]) {
                                 chordSynth[i].triggerRelease();
                                 chordSynth[i].set({ volume: -1000 });
@@ -110,11 +118,12 @@ export async function predictWebcam(video, gestureRecognizer, ctx) {
                                 chordSynth[i].set({ volume: -20 });
                                 chordSynth[i].triggerAttack(freqs[i], now);
                             } else {
-                                chordSynth[i].oscillator.frequency.rampTo(freqs[i], 0.1);
+                                    chordSynth[i].oscillator.frequency.rampTo(freqs[i], 0.1);
+                            }
                             }
                         }
+                        // pitchShift.pitch = teoria.interval(root, chordPlaying).semitones() + (adj);
                     }
-                    // pitchShift.pitch = teoria.interval(root, chordPlaying).semitones() + (adj);
                 }
             } else if (prevLeftGesture !== "Closed_Fist") {
                 const now = Tone.now();
